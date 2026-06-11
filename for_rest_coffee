@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Rest Coffee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5ede0;
+    --card: #ffffff;
+    --dark: #1a0e07;
+    --dark2: #2e1a09;
+    --gold: #c8933a;
+    --gold-light: rgba(200,147,58,0.13);
+    --gold-border: rgba(200,147,58,0.30);
+    --text: #1a0e07;
+    --muted: #7a5c43;
+    --border: rgba(26,14,7,0.10);
+    --radius: 14px;
+    --red: #e24b4a;
+    --red-bg: #fff0f0;
+    --green: #2d7a4f;
+    --green-bg: #eefaf3;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(150deg, #1a0e07 0%, #3a1e08 60%, #1a0e07 100%);
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '☕';
+    position: absolute;
+    right: 2rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 80px;
+    opacity: 0.07;
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 700;
+    color: #f5ede0;
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+  .hero-desc {
+    font-size: 13px;
+    color: #a08060;
+    margin-bottom: 18px;
+  }
+  .greeting-pill {
+    display: inline-block;
+    background: rgba(200,147,58,0.15);
+    border: 1px solid var(--gold-border);
+    border-radius: 100px;
+    padding: 7px 18px;
+    font-size: 13px;
+    color: #d4b896;
+  }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.25rem 3rem;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1.5px solid var(--border);
+    margin: 1.75rem 0 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    color: var(--muted);
+    cursor: pointer;
+    margin-bottom: -1.5px;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    font-weight: 600;
+  }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+    color: var(--dark);
+  }
+
+  /* ── MENU LIST ── */
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .menu-item:hover { border-color: var(--gold-border); }
+  .menu-num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    color: var(--gold);
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .menu-name { flex: 1; font-size: 14.5px; font-weight: 500; }
+  .menu-price { font-size: 13.5px; font-weight: 600; color: var(--gold); margin-right: 8px; }
+  .btn-hapus {
+    background: none;
+    border: 1px solid var(--red);
+    color: var(--red);
+    border-radius: 7px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .btn-hapus:hover { background: var(--red-bg); }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 2.5rem 1rem;
+    font-style: italic;
+  }
+  .empty-state span { display: block; font-size: 36px; margin-bottom: 10px; }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 1.1rem; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid rgba(26,14,7,0.18);
+    border-radius: 9px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--card);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(200,147,58,0.12);
+  }
+  .btn-simpan {
+    background: var(--dark);
+    color: #f5ede0;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 26px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 4px;
+  }
+  .btn-simpan:hover { background: var(--gold); }
+
+  .alert {
+    margin-top: 14px;
+    padding: 10px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .alert-success { background: var(--green-bg); color: var(--green); border: 1px solid rgba(45,122,79,0.20); }
+  .alert-error   { background: var(--red-bg);   color: var(--red);   border: 1px solid rgba(226,75,74,0.20); }
+  .alert-warn    { background: #fffbea;          color: #8a6a00;      border: 1px solid rgba(138,106,0,0.20); }
+
+  /* ── KASIR ── */
+  .kasir-struk {
+    background: var(--dark);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-top: 1.25rem;
+    font-family: 'Courier New', monospace;
+    color: #f5ede0;
+  }
+  .struk-head {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .struk-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
+  .struk-date { font-size: 11px; color: #a08060; margin-top: 4px; }
+  .struk-divider {
+    border: none;
+    border-top: 1px dashed rgba(200,147,58,0.3);
+    margin: 12px 0;
+  }
+  .struk-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin: 6px 0;
+  }
+  .struk-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0;
+  }
+  .struk-total-label { font-size: 15px; font-weight: bold; }
+  .struk-total-val   { font-size: 22px; font-weight: 700; color: var(--gold); }
+  .struk-footer { text-align: center; font-size: 11px; color: #a08060; margin-top: 12px; }
+
+  /* ── GALERI ── */
+  .galeri-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .galeri-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .galeri-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(26,14,7,0.12);
+  }
+  .galeri-card img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+  }
+  .galeri-body { padding: 14px 16px 16px; }
+  .galeri-name { font-weight: 600; font-size: 14.5px; margin-bottom: 5px; }
+  .galeri-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--dark);
+    color: #f5ede0;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 3px solid var(--gold);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 999;
+    max-width: 280px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 480px) {
+    .hero { padding: 2rem 1.25rem 1.75rem; }
+    .hero::after { display: none; }
+    .kasir-struk { padding: 1.5rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-eyebrow">Est. 2024 · Specialty Café</p>
+  <h1 class="hero-title">For Rest Coffee</h1>
+  <p class="hero-desc">Sistem Manajemen & Kasir Café</p>
+  <div class="greeting-pill" id="greeting">Selamat datang...</div>
+</div>
+
+<div class="container">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('daftar', this)">📋 Daftar Menu</button>
+    <button class="tab-btn" onclick="switchTab('tambah', this)">➕ Tambah Menu</button>
+    <button class="tab-btn" onclick="switchTab('kasir', this)">💰 Kasir</button>
+    <button class="tab-btn" onclick="switchTab('galeri', this)">🖼️ Galeri</button>
+  </div>
+
+  <!-- TAB 1: DAFTAR MENU -->
+  <div id="tab-daftar" class="tab-panel active">
+    <h2 class="section-title">Daftar Menu Saat Ini</h2>
+    <div id="menu-list"></div>
+  </div>
+
+  <!-- TAB 2: TAMBAH MENU -->
+  <div id="tab-tambah" class="tab-panel">
+    <h2 class="section-title">Tambah Menu Baru</h2>
+    <div class="form-group">
+      <label class="form-label">Nama Kopi</label>
+      <input class="form-input" id="nama-input" type="text" placeholder="Misal: Palm Sugar Latte">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Harga (Rp)</label>
+      <input class="form-input" id="harga-input" type="text" placeholder="Misal: 25000">
+    </div>
+    <button class="btn-simpan" onclick="tambahMenu()">Simpan Menu</button>
+    <div id="msg-tambah"></div>
+  </div>
+
+  <!-- TAB 3: KASIR -->
+  <div id="tab-kasir" class="tab-panel">
+    <h2 class="section-title">Simulasi Transaksi</h2>
+    <div id="kasir-content"></div>
+  </div>
+
+  <!-- TAB 4: GALERI -->
+  <div id="tab-galeri" class="tab-panel">
+    <h2 class="section-title">Galeri Menu Kopi</h2>
+    <div class="galeri-grid">
+      <div class="galeri-card">
+        <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?w=600" alt="Espresso">
+        <div class="galeri-body">
+          <p class="galeri-name">☕ Espresso & Kopi Susu Klasik</p>
+          <p class="galeri-desc">Perpaduan racikan espresso yang bold dengan gurihnya susu segar murni pilihan.</p>
+        </div>
+      </div>
+      <div class="galeri-card">
+        <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600" alt="Iced Latte">
+        <div class="galeri-body">
+          <p class="galeri-name">🧊 Iced Latte Premium</p>
+          <p class="galeri-desc">Es kopi susu premium rendah asam yang menyegarkan di hari sibuk.</p>
+        </div>
+      </div>
+      <div class="galeri-card">
+        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600" alt="Cappuccino">
+        <div class="galeri-body">
+          <p class="galeri-name">🍵 Cappuccino</p>
+          <p class="galeri-desc">Foam susu lembut bertemu espresso kuat dalam harmoni yang sempurna.</p>
+        </div>
+      </div>
+      <div class="galeri-card">
+        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600" alt="Signature Latte">
+        <div class="galeri-body">
+          <p class="galeri-name">🎨 Signature Latte</p>
+          <p class="galeri-desc">Kreasi barista terbaik kami dengan latte art yang memukau di setiap cangkir.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── DATA (localStorage) ──
+  function loadMenu() {
+    const raw = localStorage.getItem('forrest_menu');
+    if (raw) return JSON.parse(raw);
+    const def = [
+      { id: 1, nama: 'Americano', harga: 18000 },
+      { id: 2, nama: 'Cappuccino', harga: 22000 },
+      { id: 3, nama: 'Caramel Macchiato', harga: 28000 },
+    ];
+    localStorage.setItem('forrest_menu', JSON.stringify(def));
+    return def;
+  }
+  function saveMenu(data) {
+    localStorage.setItem('forrest_menu', JSON.stringify(data));
+  }
+
+  // ── GREETING ──
+  const jam = new Date().getHours();
+  let sapaan = 'Selamat Istirahat di For Rest Coffee! ☕';
+  if (jam >= 5 && jam < 11) sapaan = '🌅 Selamat Pagi! Semangat ditemani kopi hangat.';
+  else if (jam >= 11 && jam < 15) sapaan = '☀️ Selamat Siang! Waktunya break sejenak.';
+  else if (jam >= 15 && jam < 18) sapaan = '🌆 Selamat Sore! Nikmati senja bersama kami.';
+  else sapaan = '🌙 Selamat Malam! Waktunya rileks dan santai.';
+  document.getElementById('greeting').textContent = sapaan;
+
+  // ── TABS ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+    if (name === 'kasir') renderKasir();
+  }
+
+  // ── RENDER MENU LIST ──
+  function renderMenu() {
+    const data = loadMenu();
+    const el = document.getElementById('menu-list');
+    if (!data.length) {
+      el.innerHTML = '<div class="empty-state"><span>☕</span>Belum ada menu. Tambahkan di tab "Tambah Menu".</div>';
+      return;
+    }
+    el.innerHTML = data.map((item, i) => `
+      <div class="menu-item">
+        <div class="menu-num">${i + 1}</div>
+        <div class="menu-name">${item.nama}</div>
+        <div class="menu-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
+        <button class="btn-hapus" onclick="hapusMenu(${item.id})">Hapus</button>
+      </div>
+    `).join('');
+  }
+
+  function hapusMenu(id) {
+    let data = loadMenu().filter(m => m.id !== id);
+    saveMenu(data);
+    renderMenu();
+    showToast('Menu berhasil dihapus 🗑️');
+  }
+
+  // ── TAMBAH MENU ──
+  async function tambahMenu() {
+  const btn = document.getElementById('btn-tambah');
+  const originalText = btn.innerHTML;
+  
+  // Efek loading pada tombol
+  btn.classList.add('loading');
+  btn.innerHTML = '⏳ Memproses...';
+  btn.disabled = true;
+  
+  // Delay kecil untuk efek visual (opsional)
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  const nama = document.getElementById('nama-input').value.trim();
+  const hargaStr = document.getElementById('harga-input').value.replace(/[.,]/g, '');
+  const msg = document.getElementById('msg-tambah');
+  
+  // Validasi
+  if (!nama || !hargaStr) {
+    msg.innerHTML = '<div class="alert alert-warn">⚠️ Mohon isi nama kopi dan harga terlebih dahulu.</div>';
+    // Reset tombol
+    btn.classList.remove('loading');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    return;
+  }
+  
+  const harga = parseInt(hargaStr);
+  if (isNaN(harga)) {
+    msg.innerHTML = '<div class="alert alert-error">❌ Harga harus berupa angka. Contoh: 25000</div>';
+    btn.classList.remove('loading');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    return;
+  }
+  
+  const data = loadMenu();
+  const newId = data.length ? Math.max(...data.map(m => m.id)) + 1 : 1;
+  data.push({ id: newId, nama, harga });
+  saveMenu(data);
+  renderMenu();
+  
+  // Reset form
+  document.getElementById('nama-input').value = '';
+  document.getElementById('harga-input').value = '';
+  
+  // Efek sukses dengan animasi
+  msg.innerHTML = `<div class="alert alert-success slide-in">🎉 Menu "<b>${nama}</b>" berhasil ditambahkan!</div>`;
+  setTimeout(() => msg.innerHTML = '', 3500);
+  
+  showToast(`"${nama}" ditambahkan ✅`);
+  
+  // Reset tombol ke keadaan semula
+  btn.classList.remove('loading');
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+  
+  // Efek highlight pada menu baru (opsional)
+  highlightNewItem(newId);
+}
+
+// Fungsi untuk highlight menu yang baru ditambahkan
+function highlightNewItem(id) {
+  const newItem = document.querySelector(`[data-id="${id}"]`);
+  if (newItem) {
+    newItem.style.transition = 'all 0.5s ease';
+    newItem.style.backgroundColor = '#f0f9ff';
+    newItem.style.transform = 'scale(1.02)';
+    setTimeout(() => {
+      newItem.style.backgroundColor = '';
+      newItem.style.transform = '';
+    }, 1000);
+  }
+}
+
+  // ── KASIR ──
+  function renderKasir() {
+    const data = loadMenu();
+    const el = document.getElementById('kasir-content');
+    if (!data.length) {
+      el.innerHTML = '<div class="empty-state"><span>🧾</span>Belum ada menu. Tambahkan menu terlebih dahulu.</div>';
+      return;
+    }
+    const options = data.map(m => `<option value="${m.id}">${m.nama} — Rp ${m.harga.toLocaleString('id-ID')}</option>`).join('');
+    el.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">Pilih Kopi</label>
+        <select class="form-input" id="kasir-select" onchange="hitungTotal()">${options}</select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Jumlah Gelas</label>
+        <input class="form-input" type="number" id="kasir-jumlah" min="1" value="1" style="max-width:120px;" oninput="hitungTotal()">
+      </div>
+      <div id="kasir-struk"></div>
+    `;
+    hitungTotal();
+  }
+
+  function hitungTotal() {
+    const data = loadMenu();
+    const selEl = document.getElementById('kasir-select');
+    const jmlEl = document.getElementById('kasir-jumlah');
+    if (!selEl || !jmlEl) return;
+    const id = parseInt(selEl.value);
+    const item = data.find(m => m.id === id);
+    const jml = Math.max(1, parseInt(jmlEl.value) || 1);
+    if (!item) return;
+    const total = item.harga * jml;
+    const now = new Date();
+    const tgl = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+    const waktu = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('kasir-struk').innerHTML = `
+      <div class="kasir-struk">
+        <div class="struk-head">
+          <div class="struk-brand">FOR REST COFFEE</div>
+          <div class="struk-date">${tgl} · ${waktu}</div>
+        </div>
+        <hr class="struk-divider">
+        <div class="struk-row"><span>Menu</span><span>${item.nama}</span></div>
+        <div class="struk-row"><span>Harga Satuan</span><span>Rp ${item.harga.toLocaleString('id-ID')}</span></div>
+        <div class="struk-row"><span>Jumlah</span><span>× ${jml}</span></div>
+        <hr class="struk-divider">
+        <div class="struk-total">
+          <span class="struk-total-label">TOTAL</span>
+          <span class="struk-total-val">Rp ${total.toLocaleString('id-ID')}</span>
+        </div>
+        <hr class="struk-divider">
+        <div class="struk-footer">Terima kasih & selamat beristirahat ☕</div>
+      </div>
+    `;
+  }
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── INIT ──
+  renderMenu();
+</script>
+</body>
+</html>
